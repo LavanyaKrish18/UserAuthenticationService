@@ -1,5 +1,6 @@
 package org.example.userauthenticationservice.services;
 
+import org.example.userauthenticationservice.exceptions.InvalidCredentialsException;
 import org.example.userauthenticationservice.exceptions.UserAlreadyExistsException;
 import org.example.userauthenticationservice.models.State;
 import org.example.userauthenticationservice.models.User;
@@ -34,7 +35,15 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public User login(String email, String password) {
+    public User login(String email, String password) throws InvalidCredentialsException {
+        Optional<User> userOptional = userRepo.findUserByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+                throw new InvalidCredentialsException("Please provide correct password..");
+            }
+            return user;
+        }
         return null;
     }
 

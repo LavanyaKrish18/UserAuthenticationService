@@ -4,6 +4,7 @@ import org.example.userauthenticationservice.dtos.LoginRequestDto;
 import org.example.userauthenticationservice.dtos.LogoutRequestDto;
 import org.example.userauthenticationservice.dtos.SignupRequestDto;
 import org.example.userauthenticationservice.dtos.UserDto;
+import org.example.userauthenticationservice.exceptions.InvalidCredentialsException;
 import org.example.userauthenticationservice.exceptions.UserAlreadyExistsException;
 import org.example.userauthenticationservice.models.User;
 import org.example.userauthenticationservice.services.IAuthService;
@@ -48,7 +49,15 @@ public class AuthController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        User user = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+        User user = null;
+        try {
+            user = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+            if (user == null){
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (InvalidCredentialsException e) {
+            throw new RuntimeException(e);
+        }
         UserDto userDto = userConverter.getUserDto(user);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
