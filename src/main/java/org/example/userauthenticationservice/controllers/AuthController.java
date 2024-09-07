@@ -1,5 +1,6 @@
 package org.example.userauthenticationservice.controllers;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.example.userauthenticationservice.dtos.LoginRequestDto;
 import org.example.userauthenticationservice.dtos.LogoutRequestDto;
 import org.example.userauthenticationservice.dtos.SignupRequestDto;
@@ -12,6 +13,7 @@ import org.example.userauthenticationservice.services.UserConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,17 +51,17 @@ public class AuthController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        User user = null;
         try {
-            user = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
-            if (user == null){
+            Pair<User, MultiValueMap<String, String>> userWithHeaders = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
+            if (userWithHeaders.a == null){
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
+            UserDto userDto = userConverter.getUserDto(userWithHeaders.a);
+            return new ResponseEntity<>(userDto, userWithHeaders.b, HttpStatus.OK);
         } catch (InvalidCredentialsException e) {
             throw new RuntimeException(e);
         }
-        UserDto userDto = userConverter.getUserDto(user);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+
     }
 
     @PostMapping("/logout")
