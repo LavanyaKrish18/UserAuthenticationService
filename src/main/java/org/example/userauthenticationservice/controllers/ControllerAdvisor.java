@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerAdvisor {
 
-    @ExceptionHandler({UserAlreadyExistsException.class, InvalidCredentialsException.class})
+    @ExceptionHandler({UserAlreadyExistsException.class, InvalidCredentialsException.class, RuntimeException.class})
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }

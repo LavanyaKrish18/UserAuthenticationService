@@ -1,10 +1,7 @@
 package org.example.userauthenticationservice.controllers;
 
 import org.antlr.v4.runtime.misc.Pair;
-import org.example.userauthenticationservice.dtos.LoginRequestDto;
-import org.example.userauthenticationservice.dtos.LogoutRequestDto;
-import org.example.userauthenticationservice.dtos.SignupRequestDto;
-import org.example.userauthenticationservice.dtos.UserDto;
+import org.example.userauthenticationservice.dtos.*;
 import org.example.userauthenticationservice.exceptions.InvalidCredentialsException;
 import org.example.userauthenticationservice.exceptions.UserAlreadyExistsException;
 import org.example.userauthenticationservice.models.User;
@@ -68,6 +65,15 @@ public class AuthController {
     public ResponseEntity<UserDto> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
         //TODO : Implement after Backend Projects: Authentication - 4: Implementng OAuth 2 class
         return null;
+    }
+
+    @PostMapping("/validateToken")
+    public Boolean validateToken(@RequestBody ValidateTokenDto validateTokenDto) {
+        Boolean result = authService.validateToken(validateTokenDto.getToken(), validateTokenDto.getUserId());
+        if (!result) {
+            throw new RuntimeException("Invalid token, Please login again");
+        }
+        return result;
     }
 
 }
